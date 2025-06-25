@@ -1,55 +1,38 @@
-<!DOCTYPE html>
-<html lang="tr">
-<head>
-  <meta charset="UTF-8">
-  <title>İletişim Formu</title>
-  <style>
-    body { font-family: Arial; max-width: 600px; margin: auto; padding: 20px; }
-    input, textarea, button { width: 100%; margin-bottom: 10px; padding: 10px; }
-    button { background: #4CAF50; color: white; border: none; }
-    .success { color: green; }
-  </style>
-</head>
-<body>
+<script>
+  const form = document.getElementById('contact-form');
+  const responseBox = document.getElementById('form-response');
+  const submitButton = form.querySelector('button');
 
-  <h2>İletişim Formu</h2>
+  form.addEventListener('submit', function(e) {
+    e.preventDefault();
 
-  <form id="contact-form">
-    <input type="text" name="name" placeholder="Adınız" required>
-    <input type="email" name="email" placeholder="E-posta" required>
-    <textarea name="message" rows="4" placeholder="Mesajınız" required></textarea>
-    <button type="submit">Gönder</button>
-    <div id="form-response" class="success"></div>
-  </form>
+    // Butonu devre dışı bırak
+    submitButton.disabled = true;
+    submitButton.textContent = "Gönderiliyor...";
 
-  <script>
-    const form = document.getElementById('contact-form');
-    const responseBox = document.getElementById('form-response');
+    const formData = new FormData(form);
+    const data = new URLSearchParams();
+    for (const pair of formData) {
+      data.append(pair[0], pair[1]);
+    }
 
-    form.addEventListener('submit', function(e) {
-      e.preventDefault();
-
-      const formData = new FormData(form);
-      const data = new URLSearchParams();
-      for (const pair of formData) {
-        data.append(pair[0], pair[1]);
-      }
-
-      fetch('https://script.google.com/macros/s/AKfycbz2wp1YNDS7vEVthCb2ibmDTsCUp2MGQZj6oP5yKXIdRrqq_TnbAe2KAhnXAo_TWIKp/exec', {
-        method: 'POST',
-        body: data
-      })
-      .then(res => res.text())
-      .then(response => {
-        responseBox.textContent = "Form başarıyla gönderildi!";
-        form.reset();
-      })
-      .catch(error => {
-        responseBox.textContent = "Gönderim hatası.";
-        console.error(error);
-      });
+    fetch('https://script.google.com/macros/s/AKfycbz2wp1YNDS7vEVthCb2ibmDTsCUp2MGQZj6oP5yKXIdRrqq_TnbAe2KAhnXAo_TWIKp/exec', {
+      method: 'POST',
+      body: data
+    })
+    .then(res => res.text())
+    .then(response => {
+      responseBox.textContent = "Form başarıyla gönderildi!";
+      form.reset();
+    })
+    .catch(error => {
+      responseBox.textContent = "Gönderim hatası.";
+      console.error(error);
+    })
+    .finally(() => {
+      // Butonu tekrar aktif et
+      submitButton.disabled = false;
+      submitButton.textContent = "Gönder";
     });
-  </script>
-
-</body>
-</html>
+  });
+</script>
